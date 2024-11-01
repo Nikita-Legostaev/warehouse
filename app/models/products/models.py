@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 class Products(Base):
     __tablename__='products'
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     product_name: Mapped[str]
     manufacturer_id: Mapped[int] = mapped_column(ForeignKey('manufacturers.id'))
     category_id: Mapped[int] = mapped_column(ForeignKey('product_categories.id'))
