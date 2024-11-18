@@ -16,7 +16,7 @@ async def get_all_manufacturers(offset: int = 0, limit: int = 10):
     all_manufacturers = await ManufacturersRepositories.get_all()
     return all_manufacturers[offset:limit]
 
-@router.post("")
+@router.post("/add")
 async def add_manufactor(
     SManufacturers: SManufact,
 ):
@@ -28,7 +28,7 @@ async def add_manufactor(
     return {"detail": "Успешно"}
 
 
-@router.delete("/{manufactors_id}")
+@router.delete("/remove/{manufactors_id}")
 async def remove_manufactors(
     manufactors_id: int,
 ):
@@ -39,7 +39,7 @@ async def remove_manufactors(
     return {"detail": "Успешно удалено"}
 
 
-@router.patch("/{manufactors_id}")
+@router.patch("/edit/{manufactors_id}")
 async def update_manufactors(
     manufactors_id: int,
     SManufacturers: SManufact,  

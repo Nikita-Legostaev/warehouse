@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+</head>
+<body>
+    <button 
+        onclick="window.location.href='http://127.0.0.1:8000/pages/manufacturers'" 
+        style="margin: 5px; padding: 20px; background-color: #f0f2f5; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+        Перейти к списку производителей
+    </button>
+    <button 
+        onclick="window.location.href='http://127.0.0.1:8000/pages/categories'" 
+        style="margin: 5px; padding: 20px; background-color: #f0f2f5; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+        Перейти к списку категорий
+    </button>
+    <button 
+        onclick="window.location.href='http://127.0.0.1:8000/pages/products'" 
+        style="margin: 10px; padding: 20px; background-color: #f0f2f5; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+        Перейти к списку продуктов
+    </button>
+    {% block content %}{% endblock %}
+   
+</body>
+</html>

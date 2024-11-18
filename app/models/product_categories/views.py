@@ -15,7 +15,7 @@ async def get_all_categories(offset: int = 0, limit: int = 10):
     all_category = await CategoryRepositories.get_all()
     return all_category[offset:limit]
 
-@router.post("")
+@router.post("/add")
 async def add_manufactor(
     SCategory: SCategory,
 ):
@@ -25,7 +25,7 @@ async def add_manufactor(
     return {"detail": "Успешно"}
 
 
-@router.delete("/{category_id}")
+@router.delete("/remove/{category_id}")
 async def remove_category(
     category_id: int,
 ):
@@ -36,7 +36,7 @@ async def remove_category(
     return {"detail": "Успешно удалено"}
 
 
-@router.patch("/{category_id}")
+@router.patch("/edit/{category_id}")
 async def update_category(
     category_id: int,
     SCategory: SCategory,  

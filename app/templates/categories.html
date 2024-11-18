@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="margin: 20px; padding: 20px; background-color: #f0f2f5; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+
+    <h2 style="font-size: 28px; color: #333; font-weight: bold; margin-bottom: 20px; text-align: center;">Список категорий товаров</h2>
+    
+    <!-- Панель управления для выбора диапазона -->
+    <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+        <div>
+            <label for="offset" style="font-size: 16px; color: #333;">Показать с</label>
+            <input type="number" id="offset" value="0" min="0" style="padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 100px; background-color: #fff;">
+        </div>
+        <div>
+            <label for="limit" style="font-size: 16px; color: #333;">Количество на странице</label>
+            <input type="number" id="limit" value="10" min="1" style="padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 100px; background-color: #fff;">
+        </div>
+        <button onclick="loadCategories()" 
+                style="padding: 10px 20px; background-color: #007bff; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer; transition: transform 0.2s ease;">
+            Применить
+        </button>
+    </div>
+
+    <button 
+    onclick="openAddModal()" 
+    style="padding: 12px 24px; background-color: #007bff; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer; transition: background-color 0.3s ease;">
+    Добавить категорию
+</button>
+
+    <!-- Таблица категорий -->
+    <div style="overflow-x: auto;">
+        <table id="categoriesTable" style="width: 100%; border-spacing: 0; font-family: 'Roboto', sans-serif; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);">
+            <thead style="background-color: #007bff; color: white; text-transform: uppercase;">
+                <tr>
+                    <th style="padding: 16px 24px; text-align: left;">Название категории</th>
+                    <th style="padding: 16px 24px; text-align: center;">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Здесь будет отображаться список категорий -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Функция для загрузки категорий с учетом offset и limit
+    async function loadCategories() {
+        const offset = document.getElementById('offset').value;
+        const limit = document.getElementById('limit').value;
+        
+        try {
+            const response = await fetch(`/products_categories/all?offset=${offset}&limit=${limit}`);
+            const categories = await response.json();
+            const tableBody = document.querySelector('#categoriesTable tbody');
+            tableBody.innerHTML = ''; // Очистить текущую таблицу
+
+            if (categories.length > 0) {
+                categories.forEach(category => {
+                    const row = document.createElement('tr');
+                    row.style.transition = 'background-color 0.3s, transform 0.3s ease-in-out';
+                    row.style.cursor = 'pointer';
+                    row.innerHTML = `
+                        <td style="padding: 16px 24px; border-bottom: 1px solid #ddd;">${category.category_name}</td>
+                        <td style="padding: 16px 24px; border-bottom: 1px solid #ddd; text-align: center;">
+                            <button 
+                                style="padding: 8px 16px; background-color: #007bff; color: white; font-size: 14px; border-radius: 8px; border: none; cursor: pointer; margin-right: 10px;" 
+                                onclick="openEditModal('${category.id}', '${category.category_name}')">
+                                Изменить
+                            </button>
+                            <button 
+                                style="padding: 8px 16px; background-color: #dc3545; color: white; font-size: 14px; border-radius: 8px; border: none; cursor: pointer;" 
+                                onclick="deleteCategory('${category.id}')">
+                                Удалить
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                    
+                    // Добавляем эффект на наведение на строку
+                    row.addEventListener('mouseenter', () => {
+                        row.style.backgroundColor = '#f1f9ff';
+                        row.style.transform = 'scale(1.02)';
+                    });
+
+                    row.addEventListener('mouseleave', () => {
+                        row.style.backgroundColor = 'transparent';
+                        row.style.transform = 'scale(1)';
+                    });
+                });
+            } else {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="2" style="padding: 16px 24px; text-align: center; color: #888;">Нет данных для отображения</td>`;
+                tableBody.appendChild(row);
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки категорий:', error);
+            alert('Ошибка при загрузке данных');
+        }
+    }
+
+    // Вызов загрузки категорий при старте страницы
+    window.onload = loadCategories;
+
+    // Функции для добавления категории
+    function openAddModal() {
+        document.getElementById('addModal').style.display = 'block';
+    }
+
+    function closeAddModal() {
+        document.getElementById('addModal').style.display = 'none';
+    }
+
+    async function addCategory() {
+        const categoryName = document.getElementById('addCategoryName').value;
+
+        const data = { category_name: categoryName };
+
+        try {
+            const response = await fetch('/products_categories/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                alert('Категория успешно добавлена');
+                closeAddModal();
+                loadCategories();
+            } else {
+                alert('Ошибка при добавлении категории');
+            }
+        } catch (error) {
+            console.error('Ошибка добавления категории:', error);
+            alert('Ошибка при добавлении категории');
+        }
+    }
+
+    // Функции для редактирования категории
+    function openEditModal(id, categoryName) {
+        document.getElementById('editCategoryId').value = id;
+        document.getElementById('editCategoryName').value = categoryName;
+        document.getElementById('editModal').style.display = 'block';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    async function updateCategory() {
+        const id = document.getElementById('editCategoryId').value;
+        const categoryName = document.getElementById('editCategoryName').value;
+
+        const data = { category_name: categoryName };
+
+        try {
+            const response = await fetch(`/products_categories/edit/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                alert('Данные категории обновлены');
+                loadCategories();
+                closeEditModal();
+            } else {
+                alert('Ошибка при обновлении категории');
+            }
+        } catch (error) {
+            console.error('Ошибка обновления категории:', error);
+            alert('Ошибка при обновлении категории');
+        }
+    }
+
+    // Функция для удаления категории
+    async function deleteCategory(id) {
+        if (confirm('Вы уверены, что хотите удалить эту категорию?')) {
+            try {
+                const response = await fetch(`/products_categories/remove/${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    alert('Категория успешно удалена');
+                    loadCategories();
+                } else {
+                    alert('Ошибка при удалении категории');
+                }
+            } catch (error) {
+                console.error('Ошибка удаления категории:', error);
+                alert('Ошибка при удалении категории');
+            }
+        }
+    }
+</script>
+
+<!-- Модальные окна для добавления и редактирования категорий -->
+<div id="addModal" style="display: none;">
+    <!-- Модальное окно для добавления категории -->
+    <div style="background-color: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);">
+        <h3 style="font-size: 20px; color: #333;">Добавить категорию</h3>
+        <input type="text" id="addCategoryName" placeholder="Название категории" 
+            style="width: 100%; padding: 10px; margin-top: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;">
+        <div style="margin-top: 20px; text-align: right;">
+            <button onclick="addCategory()" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer;">Добавить</button>
+            <button onclick="closeAddModal()" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer;">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<div id="editModal" style="display: none;">
+    <!-- Модальное окно для редактирования категории -->
+    <div style="background-color: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);">
+        <h3 style="font-size: 20px; color: #333;">Редактировать категорию</h3>
+        <input type="text" id="editCategoryName" placeholder="Название категории" 
+            style="width: 100%; padding: 10px; margin-top: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;">
+        <div style="margin-top: 20px; text-align: right;">
+            <button onclick="updateCategory()" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer;">Обновить</button>
+            <button onclick="closeEditModal()" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer;">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
