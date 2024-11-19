@@ -2,7 +2,7 @@
 {% block content %}
 <div style="margin: 20px; padding: 20px; background-color: #f0f2f5; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
 
-    <h2 style="font-size: 28px; color: #333; font-weight: bold; margin-bottom: 20px; text-align: center;">Список категорий товаров</h2>
+    <h2 style="font-size: 28px; color: #333; font-weight: bold; margin-bottom: 30px; text-align: center;">Список категорий</h2>
     
     <!-- Панель управления для выбора диапазона -->
     <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; gap: 15px;">
@@ -20,18 +20,19 @@
         </button>
     </div>
 
+    <!-- Кнопка для добавления новой категории -->
     <button 
-    onclick="openAddModal()" 
-    style="padding: 12px 24px; background-color: #007bff; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer; transition: background-color 0.3s ease;">
-    Добавить категорию
-</button>
+        onclick="openAddModal()" 
+        style="margin-bottom: 30px; padding: 12px 25px; background-color: #007bff; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer; transition: transform 0.2s ease;">
+        Добавить категорию
+    </button>
 
     <!-- Таблица категорий -->
     <div style="overflow-x: auto;">
         <table id="categoriesTable" style="width: 100%; border-spacing: 0; font-family: 'Roboto', sans-serif; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);">
             <thead style="background-color: #007bff; color: white; text-transform: uppercase;">
                 <tr>
-                    <th style="padding: 16px 24px; text-align: left;">Название категории</th>
+                    <th style="padding: 16px 24px; text-align: left;">Название</th>
                     <th style="padding: 16px 24px; text-align: center;">Действия</th>
                 </tr>
             </thead>
@@ -40,6 +41,30 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Модальное окно для добавления категории -->
+    <div id="addModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border: 1px solid #ddd; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); border-radius: 8px;">
+        <h3 style="font-size: 22px; color: #333;">Добавить новую категорию</h3>
+        <form id="addForm">
+            <label style="font-size: 16px; color: #333;">Название:</label>
+            <input type="text" id="addCategoryName" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            <button type="button" onclick="addCategory()" style="padding: 12px 25px; background-color: #007bff; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer;">Сохранить</button>
+            <button type="button" onclick="closeAddModal()" style="padding: 12px 25px; margin-left: 10px; background-color: #f44336; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer;">Отмена</button>
+        </form>
+    </div>
+
+    <!-- Модальное окно для редактирования категории -->
+    <div id="editModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border: 1px solid #ddd; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); border-radius: 8px;">
+        <h3 style="font-size: 22px; color: #333;">Изменить данные категории</h3>
+        <form id="editForm">
+            <input type="hidden" id="editCategoryId">
+            <label style="font-size: 16px; color: #333;">Название:</label>
+            <input type="text" id="editCategoryName" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            <button type="button" onclick="updateCategory()" style="padding: 12px 25px; background-color: #007bff; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer;">Сохранить</button>
+            <button type="button" onclick="closeEditModal()" style="padding: 12px 25px; margin-left: 10px; background-color: #f44336; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer;">Отмена</button>
+        </form>
+    </div>
+
 </div>
 
 <script>
@@ -57,39 +82,27 @@
             if (categories.length > 0) {
                 categories.forEach(category => {
                     const row = document.createElement('tr');
-                    row.style.transition = 'background-color 0.3s, transform 0.3s ease-in-out';
-                    row.style.cursor = 'pointer';
+                    row.id = `category-row-${category.id}`;
                     row.innerHTML = `
-                        <td style="padding: 16px 24px; border-bottom: 1px solid #ddd;">${category.category_name}</td>
-                        <td style="padding: 16px 24px; border-bottom: 1px solid #ddd; text-align: center;">
+                        <td style="padding: 16px; border: 1px solid #ddd;">${category.category_name}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd; text-align: center;">
                             <button 
                                 style="padding: 8px 16px; background-color: #007bff; color: white; font-size: 14px; border-radius: 8px; border: none; cursor: pointer; margin-right: 10px;" 
                                 onclick="openEditModal('${category.id}', '${category.category_name}')">
                                 Изменить
                             </button>
                             <button 
-                                style="padding: 8px 16px; background-color: #dc3545; color: white; font-size: 14px; border-radius: 8px; border: none; cursor: pointer;" 
+                                style="padding: 8px 16px; background-color: #f44336; color: white; font-size: 14px; border-radius: 8px; border: none; cursor: pointer;" 
                                 onclick="deleteCategory('${category.id}')">
                                 Удалить
                             </button>
                         </td>
                     `;
                     tableBody.appendChild(row);
-                    
-                    // Добавляем эффект на наведение на строку
-                    row.addEventListener('mouseenter', () => {
-                        row.style.backgroundColor = '#f1f9ff';
-                        row.style.transform = 'scale(1.02)';
-                    });
-
-                    row.addEventListener('mouseleave', () => {
-                        row.style.backgroundColor = 'transparent';
-                        row.style.transform = 'scale(1)';
-                    });
                 });
             } else {
                 const row = document.createElement('tr');
-                row.innerHTML = `<td colspan="2" style="padding: 16px 24px; text-align: center; color: #888;">Нет данных для отображения</td>`;
+                row.innerHTML = `<td colspan="2" style="padding: 16px; text-align: center; color: #777;">Нет данных для отображения</td>`;
                 tableBody.appendChild(row);
             }
         } catch (error) {
@@ -124,8 +137,8 @@
 
             if (response.ok) {
                 alert('Категория успешно добавлена');
-                closeAddModal();
-                loadCategories();
+                loadCategories(); // Перезагружаем список категорий
+                closeAddModal(); // Закрываем окно
             } else {
                 alert('Ошибка при добавлении категории');
             }
@@ -161,8 +174,8 @@
 
             if (response.ok) {
                 alert('Данные категории обновлены');
-                loadCategories();
-                closeEditModal();
+                loadCategories(); // Перезагружаем список категорий
+                closeEditModal(); // Закрываем окно
             } else {
                 alert('Ошибка при обновлении категории');
             }
@@ -182,7 +195,7 @@
 
                 if (response.ok) {
                     alert('Категория успешно удалена');
-                    loadCategories();
+                    loadCategories(); // Перезагружаем список категорий
                 } else {
                     alert('Ошибка при удалении категории');
                 }
@@ -193,32 +206,4 @@
         }
     }
 </script>
-
-<!-- Модальные окна для добавления и редактирования категорий -->
-<div id="addModal" style="display: none;">
-    <!-- Модальное окно для добавления категории -->
-    <div style="background-color: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);">
-        <h3 style="font-size: 20px; color: #333;">Добавить категорию</h3>
-        <input type="text" id="addCategoryName" placeholder="Название категории" 
-            style="width: 100%; padding: 10px; margin-top: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;">
-        <div style="margin-top: 20px; text-align: right;">
-            <button onclick="addCategory()" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer;">Добавить</button>
-            <button onclick="closeAddModal()" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer;">Закрыть</button>
-        </div>
-    </div>
-</div>
-
-<div id="editModal" style="display: none;">
-    <!-- Модальное окно для редактирования категории -->
-    <div style="background-color: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);">
-        <h3 style="font-size: 20px; color: #333;">Редактировать категорию</h3>
-        <input type="text" id="editCategoryName" placeholder="Название категории" 
-            style="width: 100%; padding: 10px; margin-top: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;">
-        <div style="margin-top: 20px; text-align: right;">
-            <button onclick="updateCategory()" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer;">Обновить</button>
-            <button onclick="closeEditModal()" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer;">Закрыть</button>
-        </div>
-    </div>
-</div>
-
 {% endblock %}
