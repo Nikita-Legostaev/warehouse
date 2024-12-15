@@ -125,6 +125,15 @@
 
     async function addCategory() {
         const categoryName = document.getElementById('addCategoryName').value;
+        if (!categoryName) {
+        alert('Пожалуйста, введите название категории.');
+        return;
+    }
+    const categoryExists = await checkCategoryExists(categoryName);
+    if (categoryExists) {
+        alert('Категория с таким названием уже существует.');
+        return;
+    }
 
         const data = { category_name: categoryName };
 
@@ -162,6 +171,16 @@
     async function updateCategory() {
         const id = document.getElementById('editCategoryId').value;
         const categoryName = document.getElementById('editCategoryName').value;
+        if (!categoryName) {
+        alert('Пожалуйста, введите название категории.');
+        return;
+    }
+
+    const categoryExists = await checkCategoryExists(categoryName);
+    if (categoryExists) {
+        alert('Категория с таким названием уже существует.');
+        return;
+    }
 
         const data = { category_name: categoryName };
 
@@ -184,6 +203,17 @@
             alert('Ошибка при обновлении категории');
         }
     }
+
+    async function checkCategoryExists(categoryName) {
+    try {
+        const response = await fetch(`/products_categories/check?name=${encodeURIComponent(categoryName)}`);
+        const data = await response.json();
+        return data.exists; // Предполагается, что сервер возвращает { exists: true } или { exists: false }
+    } catch (error) {
+        console.error('Ошибка при проверке категории:', error);
+        return false;
+    }
+}
 
     // Функция для удаления категории
     async function deleteCategory(id) {

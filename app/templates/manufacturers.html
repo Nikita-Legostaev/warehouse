@@ -140,6 +140,23 @@
         const address = document.getElementById('addAddress').value;
         const email = document.getElementById('addEmail').value;
 
+        if (!manufacturerName) {
+        alert('Пожалуйста, введите имя производителя.');
+        return;
+    }
+
+    if (!address) {
+        alert('Пожалуйста, введите адрес производителя.');
+        return;
+    }
+
+    // Проверка на корректность email
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!email || !emailRegex.test(email)) {
+        alert('Пожалуйста, введите корректный email.');
+        return;
+    }
+
         const data = { manufacturer_name: manufacturerName, address, email };
 
         try {
@@ -162,6 +179,8 @@
         }
     }
 
+    
+
     // Функции для редактирования производителя
     function openEditModal(id, manufacturerName, address, email) {
         document.getElementById('editManufacturerId').value = id;
@@ -180,6 +199,23 @@
         const manufacturerName = document.getElementById('editManufacturerName').value;
         const address = document.getElementById('editAddress').value;
         const email = document.getElementById('editEmail').value;
+
+        if (!manufacturerName) {
+        alert('Пожалуйста, введите имя производителя.');
+        return;
+    }
+
+    if (!address) {
+        alert('Пожалуйста, введите адрес производителя.');
+        return;
+    }
+
+    // Проверка на корректность email
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!email || !emailRegex.test(email)) {
+        alert('Пожалуйста, введите корректный email.');
+        return;
+    }
 
         const data = { manufacturer_name: manufacturerName, address, email };
 

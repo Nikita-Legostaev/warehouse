@@ -147,6 +147,31 @@
         const quantity = document.getElementById('addQuantity').value;
         const supplierName = document.getElementById('addSupplierName').value;
 
+        if (!productId || !shipmentDate || !quantity || !supplierName) {
+        alert('Пожалуйста, заполните все поля.');
+        return;
+    }
+
+    // Проверка на корректность даты отгрузки (не должна быть в будущем)
+    const shipmentDateObj = new Date(shipmentDate);
+    const currentDate = new Date();
+    if (shipmentDateObj > currentDate) {
+        alert('Дата отгрузки не может быть в будущем.');
+        return;
+    }
+
+    // Проверка на количество (оно должно быть числом и больше нуля)
+    if (isNaN(quantity) || quantity <= 0) {
+        alert('Количество должно быть числом и больше нуля.');
+        return;
+    }
+
+    // Проверка на корректность названия поставщика
+    if (supplierName.length === 0) {
+        alert('Пожалуйста, укажите имя поставщика.');
+        return;
+    }
+
         const data = { product_id: productId, shipment_date: shipmentDate, quantity, supplier_name: supplierName };
 
         try {
@@ -189,6 +214,31 @@
         const shipmentDate = document.getElementById('editShipmentDate').value;
         const quantity = document.getElementById('editQuantity').value;
         const supplierName = document.getElementById('editSupplierName').value;
+
+        if (!productId || !shipmentDate || !quantity || !supplierName) {
+        alert('Пожалуйста, заполните все поля.');
+        return;
+    }
+
+    // Проверка на корректность даты отгрузки (не должна быть в будущем)
+    const shipmentDateObj = new Date(shipmentDate);
+    const currentDate = new Date();
+    if (shipmentDateObj > currentDate) {
+        alert('Дата отгрузки не может быть в будущем.');
+        return;
+    }
+
+    // Проверка на количество (оно должно быть числом и больше нуля)
+    if (isNaN(quantity) || quantity <= 0) {
+        alert('Количество должно быть числом и больше нуля.');
+        return;
+    }
+
+    // Проверка на корректность названия поставщика
+    if (supplierName.length === 0) {
+        alert('Пожалуйста, укажите имя поставщика.');
+        return;
+    }
 
         const data = { product_id: productId, shipment_date: shipmentDate, quantity, supplier_name: supplierName };
 

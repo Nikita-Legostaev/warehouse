@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 <div style="margin: 20px; padding: 20px; background-color: #f0f2f5; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
-
     <h2 style="font-size: 28px; color: #333; font-weight: bold; margin-bottom: 30px; text-align: center;">Список продуктов</h2>
     
     <!-- Панель управления для выбора диапазона -->
@@ -19,7 +18,6 @@
             Применить
         </button>
     </div>
-
     <!-- Форма поиска по всем параметрам -->
     <div>
         <label for="product_name" style="font-size: 16px; color: #333;">Поиск по названию</label>
@@ -64,8 +62,6 @@
         Применить
     </button>
     <div>
-        
-
     </div>
 
     <!-- Кнопка для добавления нового продукта -->
@@ -172,26 +168,24 @@
         </form>
     </div>
 
-    <div id="pagination" style="margin-top: 20px; text-align: center;">
-        <button id="prevPageBtn" onclick="changePage('prev')" style="padding: 5px 15px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">
+    <div id="pagination" style="margin-top: 20px; text-align: center; background-color: white; padding: 15px; border: 1px solid #ddd; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); border-radius: 8px;">
+        <button id="prevPageBtn" onclick="changePage('prev')" style="padding: 8px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; font-size: 16px; border-radius: 8px; transition: background-color 0.3s;">
             Предыдущая страница
         </button>
-        <span id="pageInfo" style="margin: 0 10px;">Страница 1</span>
-        <button id="nextPageBtn" onclick="changePage('next')" style="padding: 5px 15px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">
+        <span id="pageInfo" style="margin: 0 15px; font-size: 16px; color: #333;">Страница 1</span>
+        <button id="nextPageBtn" onclick="changePage('next')" style="padding: 8px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; font-size: 16px; border-radius: 8px; transition: background-color 0.3s;">
             Следующая страница
         </button>
     </div>
-    
+</div>
 
-    
 <script>
-
     let currentPage = 1; // Текущая страница
-    let limit = 10; // Начальное количество клиентов на странице
+    let limit = 10; // Количество продуктов на странице
     let offset = 0; // Начальный offset (смещение)
-    
+
+    // Функция загрузки продуктов
     async function loadProducts() {
-        
         try {
             const response = await fetch(`/products/all?offset=${offset}&limit=${limit}`);
             const products = await response.json();
@@ -229,7 +223,7 @@
                 });
             } else {
                 const row = document.createElement('tr');
-                row.innerHTML = `<td colspan="5" style="padding: 16px; text-align: center; color: #777;">Нет данных для отображения</td>`;
+                row.innerHTML = `<td colspan="10" style="padding: 16px; text-align: center; color: #777;">Нет данных для отображения</td>`;
                 tableBody.appendChild(row);
             }
         } catch (error) {
@@ -239,10 +233,6 @@
 
         updatePagination();
     }
-
-
-
-
 
     async function searchProducts() {
     const productName = document.getElementById('product_name').value;
@@ -294,10 +284,10 @@
                     <td style="padding: 10px; border: 1px solid #ddd;">${product.stock_quantity}</td>
                     <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
                         <button 
-                            style="margin-right: 5px; padding: 5px 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer;"
-                            onclick="openEditProductModal('${product.id}', '${product.product_name}', '${product.manufacturer_id}', '${product.category_id}', '${product.price}', '${product.expiration_date}', '${product.weight}', '${product.stock_id}', '${product.stock_location}', '${product.stock_quantity}')">
-                            Изменить
-                        </button>
+                                style="padding: 8px 16px; background-color: #007bff; color: white; font-size: 14px; border-radius: 8px; border: none; cursor: pointer; margin-right: 10px;" 
+                                onclick="openEditModal('${product.id}', '${product.product_name}', '${product.manufacturer_id}', '${product.category_id}', '${product.price}', '${product.expiration_date}', '${product.weight}', '${product.stock_id}', '${product.stock_location}', '${product.stock_quantity}')">
+                                Изменить
+                            </button>
                         <button 
                             style="padding: 5px 10px; background-color: #f44336; color: white; border: none; cursor: pointer;" 
                             onclick="deleteProduct('${product.id}')">
@@ -340,6 +330,30 @@
         const stockId = document.getElementById('addStockId').value;
         const stockLocation = document.getElementById('addStockLocation').value;
         const stockQuantity = document.getElementById('addStockQuantity').value;
+
+        if (!productName || !manufacturerId || !categoryId || !price || !expirationDate || !weight || !stockId || !stockLocation || !stockQuantity) {
+        alert('Пожалуйста, заполните все поля.');
+        return;
+    }
+
+    // Проверка на корректность числовых значений
+    if (isNaN(price) || isNaN(weight) || isNaN(stockQuantity)) {
+        alert('Цена, вес и количество должны быть числовыми значениями.');
+        return;
+    }
+
+    const expirationDateObj = new Date(expirationDate);
+    if (isNaN(expirationDateObj.getTime())) {
+        alert('Некорректная дата истечения срока.');
+        return;
+    }
+
+    // Проверка, что дата истечения срока не раньше текущей
+    const currentDate = new Date();
+    if (expirationDateObj < currentDate) {
+        alert('Дата истечения срока не может быть раньше текущей даты.');
+        return;
+    }
 
         const data = { product_name: productName, manufacturer_id: manufacturerId, category_id: categoryId, price: price, expiration_date: expirationDate, weight: weight, stock_id: stockId, stock_location: stockLocation, stock_quantity: stockQuantity };
 
@@ -394,6 +408,30 @@
         const stockLocation = document.getElementById('editStockLocation').value;
         const stockQuantity = document.getElementById('editStockQuantity').value;
 
+        if (!productName || !manufacturerId || !categoryId || !price || !expirationDate || !weight || !stockId || !stockLocation || !stockQuantity) {
+        alert('Пожалуйста, заполните все поля.');
+        return;
+    }
+
+    // Проверка на корректность числовых значений
+    if (isNaN(price) || isNaN(weight) || isNaN(stockQuantity)) {
+        alert('Цена, вес и количество должны быть числовыми значениями.');
+        return;
+    }
+
+    const expirationDateObj = new Date(expirationDate);
+    if (isNaN(expirationDateObj.getTime())) {
+        alert('Некорректная дата истечения срока.');
+        return;
+    }
+
+    // Проверка, что дата истечения срока не раньше текущей
+    const currentDate = new Date();
+    if (expirationDateObj < currentDate) {
+        alert('Дата истечения срока не может быть раньше текущей даты.');
+        return;
+    }
+
         const data = { product_name: productName, manufacturer_id: manufacturerId, category_id: categoryId, price: price, expiration_date: expirationDate, weight: weight, stock_id: stockId, stock_location: stockLocation, stock_quantity: stockQuantity };
 
         try {
@@ -433,13 +471,15 @@
             }
         }
     }
+
+    // Функция обновления пагинации
     function updatePagination() {
         document.getElementById('pageInfo').innerText = `Страница ${currentPage}`;
         const prevPageBtn = document.getElementById('prevPageBtn');
         const nextPageBtn = document.getElementById('nextPageBtn');
-        
+
         prevPageBtn.disabled = currentPage === 1;
-        nextPageBtn.disabled = currentPage === getTotalPages();
+        nextPageBtn.disabled = false; // Вы можете включить дополнительную логику для блокировки кнопки "Следующая страница"
     }
 
     // Функция для изменения страницы
@@ -453,15 +493,10 @@
             limit += 10;
             offset += 10;
         }
-        loadClients();
+        loadProducts(); // Загружаем продукты для новой страницы
     }
 
-    // Получение общего количества страниц
-    function getTotalPages() {
-        const totalClients = 100; // Пример
-        return Math.ceil(totalClients / limit);
-    }
-
+    // Вызов загрузки продуктов при старте страницы
     window.onload = loadProducts;
 </script>
 {% endblock %}

@@ -201,6 +201,11 @@
     async function addProductFeature() {
         const featureDescription = document.getElementById('addFeatureDescription').value;
 
+        if (!featureDescription) {
+        alert('Пожалуйста, введите описание характеристики.');
+        return;
+    }
+
         const data = { feature_description: featureDescription };
 
         try {
@@ -237,6 +242,11 @@
     async function updateProductFeature() {
         const id = document.getElementById('editFeatureId').value;
         const featureDescription = document.getElementById('editFeatureDescription').value;
+
+        if (!featureDescription) {
+        alert('Пожалуйста, введите описание характеристики.');
+        return;
+    }
 
         const data = { feature_description: featureDescription };
 
