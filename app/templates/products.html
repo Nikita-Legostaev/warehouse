@@ -21,8 +21,53 @@
     </div>
 
     <!-- Форма поиска по всем параметрам -->
-    <!-- (Оставим без изменений, так как это не влияет на пагинацию) -->
+    <div>
+        <label for="product_name" style="font-size: 16px; color: #333;">Поиск по названию</label>
+        <input type="text" id="product_name" style="padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 150px; background-color: #fff;">
+    </div>
+    <div>
+        <label for="searchManufacturerId" style="font-size: 16px; color: #333;">Производитель</label>
+        <input type="number" id="searchManufacturerId" style="padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 150px; background-color: #fff;">
+    </div>
+    <div>
+        <label for="searchCategoryId" style="font-size: 16px; color: #333;">Категория</label>
+        <input type="number" id="searchCategoryId" style="padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 150px; background-color: #fff;">
+    </div>
+    <div>
+        <label for="searchPrice" style="font-size: 16px; color: #333;">Цена</label>
+        <input type="number" id="searchPrice" style="padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 150px; background-color: #fff;">
+    </div>
+    <div>
+        <label for="searchExpirationDate" style="font-size: 16px; color: #333;">Дата истечения</label>
+        <input type="date" id="searchExpirationDate" style="padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 150px; background-color: #fff;">
+    </div>
+    <div>
+        <label for="searchWeight" style="font-size: 16px; color: #333;">Вес</label>
+        <input type="number" id="searchWeight" style="padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 150px; background-color: #fff;">
+    </div>
+    <div>
+        <label for="searchStockId" style="font-size: 16px; color: #333;">ID склада</label>
+        <input type="number" id="searchStockId" style="padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 150px; background-color: #fff;">
+    </div>
+    <div>
+        <label for="searchStockLocation" style="font-size: 16px; color: #333;">Местоположение на складе</label>
+        <input type="number" id="searchStockLocation" style="padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 150px; background-color: #fff;">
+    </div>
+    <div>
+        <label for="searchStockQuantity" style="font-size: 16px; color: #333;">Количество на складе</label>
+        <input type="number" id="searchStockQuantity" style="padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 150px; background-color: #fff;">
+        
+    </div>
     
+    <button onclick="searchProducts()" 
+            style="padding: 10px 20px; background-color: #007bff; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer; transition: transform 0.2s ease;">
+        Применить
+    </button>
+    <div>
+        
+
+    </div>
+
     <!-- Кнопка для добавления нового продукта -->
     <button 
         onclick="openAddModal()" 
@@ -53,6 +98,80 @@
         </table>
     </div>
 
+    <!-- Модальное окно для добавления продукта -->
+    <div id="addModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border: 1px solid #ddd; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); border-radius: 8px;">
+        <h3 style="font-size: 22px; color: #333;">Добавить новый продукт</h3>
+        <form id="addForm">
+            <label style="font-size: 16px; color: #333;">Название:</label>
+            <input type="text" id="addProductName" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Производитель:</label>
+            <input type="number" id="addManufacturerId" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Категория:</label>
+            <input type="number" id="addCategoryId" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Цена:</label>
+            <input type="number" id="addPrice" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Дата истечения:</label>
+            <input type="date" id="addExpirationDate" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Вес:</label>
+            <input type="number" id="addWeight" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Склад:</label>
+            <input type="number" id="addStockId" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Местоположение на складе:</label>
+            <input type="number" id="addStockLocation" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Количество на складе:</label>
+            <input type="number" id="addStockQuantity" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 20px;">
+            
+            <button type="button" onclick="addProduct()" style="padding: 12px 25px; background-color: #007bff; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer;">Сохранить</button>
+            <button type="button" onclick="closeAddModal()" style="padding: 12px 25px; margin-left: 10px; background-color: #f44336; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer;">Отмена</button>
+        </form>
+    </div>
+
+    <!-- Модальное окно для редактирования продукта -->
+    <div id="editModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border: 1px solid #ddd; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); border-radius: 8px;">
+        <h3 style="font-size: 22px; color: #333;">Изменить данные продукта</h3>
+        <form id="editForm">
+            <input type="hidden" id="editProductId">
+            
+            <label style="font-size: 16px; color: #333;">Название:</label>
+            <input type="text" id="editProductName" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Производитель:</label>
+            <input type="number" id="editManufacturerId" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Категория:</label>
+            <input type="number" id="editCategoryId" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Цена:</label>
+            <input type="number" id="editPrice" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Дата истечения:</label>
+            <input type="date" id="editExpirationDate" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Вес:</label>
+            <input type="number" id="editWeight" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Склад:</label>
+            <input type="number" id="editStockId" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Местоположение на складе:</label>
+            <input type="number" id="editStockLocation" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            
+            <label style="font-size: 16px; color: #333;">Количество на складе:</label>
+            <input type="number" id="editStockQuantity" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 20px;">
+            
+            <button type="button" onclick="updateProduct()" style="padding: 12px 25px; background-color: #007bff; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer;">Сохранить</button>
+            <button type="button" onclick="closeEditModal()" style="padding: 12px 25px; margin-left: 10px; background-color: #f44336; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer;">Отмена</button>
+        </form>
+    </div>
+
     <div id="pagination" style="margin-top: 20px; text-align: center;">
         <button id="prevPageBtn" onclick="changePage('prev')" style="padding: 5px 15px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">
             Предыдущая страница
@@ -62,29 +181,25 @@
             Следующая страница
         </button>
     </div>
+    
 
+    
 <script>
 
     let currentPage = 1; // Текущая страница
-    let limit = 10; // Количество продуктов на странице
+    let limit = 10; // Начальное количество клиентов на странице
     let offset = 0; // Начальный offset (смещение)
-    let totalProducts = 0; // Общее количество продуктов
-
-    // Функция для загрузки продуктов
+    
     async function loadProducts() {
-        offset = (currentPage - 1) * limit; // Расчет смещения для текущей страницы
         
         try {
             const response = await fetch(`/products/all?offset=${offset}&limit=${limit}`);
             const products = await response.json();
-            
-            // Получаем общее количество продуктов (это должен возвращать сервер)
-            totalProducts = products.total;  // Зависит от вашего API, как он возвращает общее количество
             const tableBody = document.querySelector('#productsTable tbody');
             tableBody.innerHTML = ''; // Очистить текущую таблицу
 
-            if (products.data.length > 0) {
-                products.data.forEach(product => {
+            if (products.length > 0) {
+                products.forEach(product => {
                     const row = document.createElement('tr');
                     row.id = `product-row-${product.id}`;
                     row.innerHTML = `
@@ -98,15 +213,23 @@
                         <td style="padding: 16px; border: 1px solid #ddd;">${product.stock_location}</td>
                         <td style="padding: 16px; border: 1px solid #ddd;">${product.stock_quantity}</td>
                         <td style="padding: 16px; border: 1px solid #ddd; text-align: center;">
-                            <button onclick="openEditModal('${product.id}')">Изменить</button>
-                            <button onclick="deleteProduct('${product.id}')">Удалить</button>
+                            <button 
+                                style="padding: 8px 16px; background-color: #007bff; color: white; font-size: 14px; border-radius: 8px; border: none; cursor: pointer; margin-right: 10px;" 
+                                onclick="openEditModal('${product.id}', '${product.product_name}', '${product.manufacturer_id}', '${product.category_id}', '${product.price}', '${product.expiration_date}', '${product.weight}', '${product.stock_id}', '${product.stock_location}', '${product.stock_quantity}')">
+                                Изменить
+                            </button>
+                            <button 
+                                style="padding: 8px 16px; background-color: #f44336; color: white; font-size: 14px; border-radius: 8px; border: none; cursor: pointer;" 
+                                onclick="deleteProduct('${product.id}')">
+                                Удалить
+                            </button>
                         </td>
                     `;
                     tableBody.appendChild(row);
                 });
             } else {
                 const row = document.createElement('tr');
-                row.innerHTML = `<td colspan="10" style="padding: 16px; text-align: center; color: #777;">Нет данных для отображения</td>`;
+                row.innerHTML = `<td colspan="5" style="padding: 16px; text-align: center; color: #777;">Нет данных для отображения</td>`;
                 tableBody.appendChild(row);
             }
         } catch (error) {
@@ -117,33 +240,228 @@
         updatePagination();
     }
 
-    // Функция для обновления пагинации
+
+
+
+
+    async function searchProducts() {
+    const productName = document.getElementById('product_name').value;
+    const manufacturerId = document.getElementById('searchManufacturerId').value;
+    const categoryId = document.getElementById('searchCategoryId').value;
+    const price = document.getElementById('searchPrice').value;
+    const expirationDate = document.getElementById('searchExpirationDate').value;
+    const weight = document.getElementById('searchWeight').value;
+    const stockId = document.getElementById('searchStockId').value;
+    const stockLocation = document.getElementById('searchStockLocation').value;
+    const stockQuantity = document.getElementById('searchStockQuantity').value;
+    const offset = document.getElementById('offset').value;
+    const limit = document.getElementById('limit').value;
+
+    // Создаем объект с параметрами запроса, исключая пустые значения
+    const params = new URLSearchParams();
+    if (productName) params.append('product_name', productName);
+    if (manufacturerId) params.append('manufacturer_id', manufacturerId);
+    if (categoryId) params.append('category_id', categoryId);
+    if (price) params.append('price', price);
+    if (expirationDate) params.append('expiration_date', expirationDate);
+    if (weight) params.append('weight', weight);
+    if (stockId) params.append('stock_id', stockId);
+    if (stockLocation) params.append('stock_location', stockLocation);
+    if (stockQuantity) params.append('stock_quantity', stockQuantity);
+    params.append('offset', offset);
+    params.append('limit', limit);
+
+    try {
+        // Отправляем запрос с параметрами
+        const response = await fetch(`/products/search/?${params.toString()}`);
+        const products = await response.json();
+        const tableBody = document.querySelector('#productsTable tbody');
+        tableBody.innerHTML = ''; // Очистить текущую таблицу
+
+        if (products.length > 0) {
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                row.id = `product-row-${product.id}`;
+                row.innerHTML = `
+                    <td style="padding: 10px; border: 1px solid #ddd;">${product.product_name}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${product.manufacturer_id}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${product.category_id}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${product.price}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${product.expiration_date}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${product.weight}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${product.stock_id}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${product.stock_location}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${product.stock_quantity}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                        <button 
+                            style="margin-right: 5px; padding: 5px 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer;"
+                            onclick="openEditProductModal('${product.id}', '${product.product_name}', '${product.manufacturer_id}', '${product.category_id}', '${product.price}', '${product.expiration_date}', '${product.weight}', '${product.stock_id}', '${product.stock_location}', '${product.stock_quantity}')">
+                            Изменить
+                        </button>
+                        <button 
+                            style="padding: 5px 10px; background-color: #f44336; color: white; border: none; cursor: pointer;" 
+                            onclick="deleteProduct('${product.id}')">
+                            Удалить
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } else {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td colspan="10" style="padding: 10px; text-align: center; color: #666;">Нет данных для отображения</td>`;
+            tableBody.appendChild(row);
+        }
+    } catch (error) {
+        console.error('Ошибка поиска продуктов:', error);
+        alert('Ошибка при поиске продуктов');
+    }
+}
+
+    // Вызов загрузки продуктов при старте страницы
+    window.onload = loadProducts;
+
+    // Функции для добавления продукта
+    function openAddModal() {
+        document.getElementById('addModal').style.display = 'block';
+    }
+
+    function closeAddModal() {
+        document.getElementById('addModal').style.display = 'none';
+    }
+
+    async function addProduct() {
+        const productName = document.getElementById('addProductName').value;
+        const manufacturerId = document.getElementById('addManufacturerId').value;
+        const categoryId = document.getElementById('addCategoryId').value;
+        const price = document.getElementById('addPrice').value;
+        const expirationDate = document.getElementById('addExpirationDate').value;
+        const weight = document.getElementById('addWeight').value;
+        const stockId = document.getElementById('addStockId').value;
+        const stockLocation = document.getElementById('addStockLocation').value;
+        const stockQuantity = document.getElementById('addStockQuantity').value;
+
+        const data = { product_name: productName, manufacturer_id: manufacturerId, category_id: categoryId, price: price, expiration_date: expirationDate, weight: weight, stock_id: stockId, stock_location: stockLocation, stock_quantity: stockQuantity };
+
+        try {
+            const response = await fetch('/products/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                alert('Продукт успешно добавлен');
+                loadProducts(); // Перезагружаем список продуктов
+                closeAddModal(); // Закрываем окно
+            } else {
+                alert('Ошибка при добавлении продукта');
+            }
+        } catch (error) {
+            console.error('Ошибка добавления продукта:', error);
+            alert('Ошибка при добавлении продукта');
+        }
+    }
+
+    // Функции для редактирования продукта
+    function openEditModal(id, productName, manufacturerId, categoryId, price, expirationDate, weight, stockId, stockLocation, stockQuantity) {
+        document.getElementById('editProductId').value = id;
+        document.getElementById('editProductName').value = productName;
+        document.getElementById('editManufacturerId').value = manufacturerId;
+        document.getElementById('editCategoryId').value = categoryId;
+        document.getElementById('editPrice').value = price;
+        document.getElementById('editExpirationDate').value = expirationDate;
+        document.getElementById('editWeight').value = weight;
+        document.getElementById('editStockId').value = stockId;
+        document.getElementById('editStockLocation').value = stockLocation;
+        document.getElementById('editStockQuantity').value = stockQuantity;
+        document.getElementById('editModal').style.display = 'block';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    async function updateProduct() {
+        const id = document.getElementById('editProductId').value;
+        const productName = document.getElementById('editProductName').value;
+        const manufacturerId = document.getElementById('editManufacturerId').value;
+        const categoryId = document.getElementById('editCategoryId').value;
+        const price = document.getElementById('editPrice').value;
+        const expirationDate = document.getElementById('editExpirationDate').value;
+        const weight = document.getElementById('editWeight').value;
+        const stockId = document.getElementById('editStockId').value;
+        const stockLocation = document.getElementById('editStockLocation').value;
+        const stockQuantity = document.getElementById('editStockQuantity').value;
+
+        const data = { product_name: productName, manufacturer_id: manufacturerId, category_id: categoryId, price: price, expiration_date: expirationDate, weight: weight, stock_id: stockId, stock_location: stockLocation, stock_quantity: stockQuantity };
+
+        try {
+            const response = await fetch(`/products/edit/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                alert('Продукт успешно обновлен');
+                loadProducts();
+                closeEditModal();
+            } else {
+                alert('Ошибка при обновлении продукта');
+            }
+        } catch (error) {
+            console.error('Ошибка обновления продукта:', error);
+            alert('Ошибка при обновлении продукта');
+        }
+    }
+
+    // Функция удаления продукта
+    async function deleteProduct(id) {
+        if (confirm('Вы уверены, что хотите удалить этот продукт?')) {
+            try {
+                const response = await fetch(`/products/remove/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    alert('Продукт успешно удалён');
+                    loadProducts();
+                } else {
+                    alert('Ошибка при удалении продукта');
+                }
+            } catch (error) {
+                console.error('Ошибка удаления продукта:', error);
+                alert('Ошибка при удалении продукта');
+            }
+        }
+    }
     function updatePagination() {
         document.getElementById('pageInfo').innerText = `Страница ${currentPage}`;
         const prevPageBtn = document.getElementById('prevPageBtn');
         const nextPageBtn = document.getElementById('nextPageBtn');
-
+        
         prevPageBtn.disabled = currentPage === 1;
         nextPageBtn.disabled = currentPage === getTotalPages();
-    }
-
-    // Получение общего количества страниц
-    function getTotalPages() {
-        return Math.ceil(totalProducts / limit);
     }
 
     // Функция для изменения страницы
     function changePage(direction) {
         if (direction === 'prev' && currentPage > 1) {
             currentPage--;
-        } else if (direction === 'next' && currentPage < getTotalPages()) {
+            limit -= 10;
+            offset -= 10;
+        } else if (direction === 'next') {
             currentPage++;
+            limit += 10;
+            offset += 10;
         }
-        loadProducts(); // Загружаем данные для новой страницы
+        loadClients();
     }
 
-    // Вызов загрузки продуктов при старте страницы
-    window.onload = loadProducts;
+    // Получение общего количества страниц
+    function getTotalPages() {
+        const totalClients = 100; // Пример
+        return Math.ceil(totalClients / limit);
+    }
 
+    window.onload = loadProducts;
 </script>
 {% endblock %}
