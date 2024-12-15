@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Количество записей</h1>
+    
+    <canvas id="countsChart" width="400" height="200"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Передаем данные из Python в JavaScript с использованием фильтра tojson для сериализации в JSON
+        const countsData = {{ counts_data | tojson | safe }};
+        console.log(countsData);  // Для отладки в консоль
+        
+        // Проверим, что данные пришли корректно
+        console.log(countsData);
+
+        // Сборка данных для диаграммы
+        const labels = Object.keys(countsData);  // Названия категорий
+        const dataValues = Object.values(countsData);  // Количества записей
+
+        const ctx = document.getElementById('countsChart').getContext('2d');
+
+        // Создание диаграммы
+        const countsChart = new Chart(ctx, {
+            type: 'bar', // Тип диаграммы (bar — столбчатая диаграмма)
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Количество записей',
+                    data: dataValues,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)', // Цвет столбцов
+                    borderColor: 'rgba(54, 162, 235, 1)', // Цвет границ столбцов
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

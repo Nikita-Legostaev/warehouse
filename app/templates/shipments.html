@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="margin: 20px; padding: 20px; background-color: #f0f2f5; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+
+    <h2 style="font-size: 28px; color: #333; font-weight: bold; margin-bottom: 30px; text-align: center;">Список отгрузок</h2>
+    
+    <!-- Панель управления для выбора диапазона -->
+    <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+        <div>
+            <label for="offset" style="font-size: 16px; color: #333;">Показать с</label>
+            <input type="number" id="offset" value="0" min="0" style="padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 100px; background-color: #fff;">
+        </div>
+        <div>
+            <label for="limit" style="font-size: 16px; color: #333;">Количество на странице</label>
+            <input type="number" id="limit" value="10" min="1" style="padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 100px; background-color: #fff;">
+        </div>
+        <button onclick="loadShipments()" 
+                style="padding: 10px 20px; background-color: #007bff; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer; transition: transform 0.2s ease;">
+            Применить
+        </button>
+    </div>
+
+    <!-- Кнопка для добавления новой отгрузки -->
+    <button 
+        onclick="openAddModal()" 
+        style="margin-bottom: 30px; padding: 12px 25px; background-color: #007bff; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer; transition: transform 0.2s ease;">
+        Добавить отгрузку
+    </button>
+
+    <!-- Таблица отгрузок -->
+    <div style="overflow-x: auto;">
+        <table id="shipmentsTable" style="width: 100%; border-spacing: 0; font-family: 'Roboto', sans-serif; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);">
+            <thead style="background-color: #007bff; color: white; text-transform: uppercase;">
+                <tr>
+                    <th style="padding: 16px 24px; text-align: left;">Продукт</th>
+                    <th style="padding: 16px 24px; text-align: left;">Дата отгрузки</th>
+                    <th style="padding: 16px 24px; text-align: left;">Количество</th>
+                    <th style="padding: 16px 24px; text-align: left;">Поставщик</th>
+                    <th style="padding: 16px 24px; text-align: center;">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Здесь будет отображаться список отгрузок -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Модальное окно для добавления отгрузки -->
+    <div id="addModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border: 1px solid #ddd; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); border-radius: 8px;">
+        <h3 style="font-size: 22px; color: #333;">Добавить новую отгрузку</h3>
+        <form id="addForm">
+            <label style="font-size: 16px; color: #333;">Продукт ID:</label>
+            <input type="number" id="addProductId" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            <label style="font-size: 16px; color: #333;">Дата отгрузки:</label>
+            <input type="date" id="addShipmentDate" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            <label style="font-size: 16px; color: #333;">Количество:</label>
+            <input type="number" id="addQuantity" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            <label style="font-size: 16px; color: #333;">Поставщик:</label>
+            <input type="text" id="addSupplierName" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 20px;">
+            <button type="button" onclick="addShipment()" style="padding: 12px 25px; background-color: #007bff; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer;">Сохранить</button>
+            <button type="button" onclick="closeAddModal()" style="padding: 12px 25px; margin-left: 10px; background-color: #f44336; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer;">Отмена</button>
+        </form>
+    </div>
+
+    <!-- Модальное окно для редактирования отгрузки -->
+    <div id="editModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border: 1px solid #ddd; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); border-radius: 8px;">
+        <h3 style="font-size: 22px; color: #333;">Изменить данные отгрузки</h3>
+        <form id="editForm">
+            <input type="hidden" id="editShipmentId">
+            <label style="font-size: 16px; color: #333;">Продукт ID:</label>
+            <input type="number" id="editProductId" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            <label style="font-size: 16px; color: #333;">Дата отгрузки:</label>
+            <input type="date" id="editShipmentDate" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            <label style="font-size: 16px; color: #333;">Количество:</label>
+            <input type="number" id="editQuantity" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px;">
+            <label style="font-size: 16px; color: #333;">Поставщик:</label>
+            <input type="text" id="editSupplierName" style="width: 100%; padding: 8px 15px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 20px;">
+            <button type="button" onclick="updateShipment()" style="padding: 12px 25px; background-color: #007bff; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer;">Сохранить</button>
+            <button type="button" onclick="closeEditModal()" style="padding: 12px 25px; margin-left: 10px; background-color: #f44336; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer;">Отмена</button>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    // Функция для загрузки отгрузок с учетом offset и limit
+    async function loadShipments() {
+        const offset = document.getElementById('offset').value;
+        const limit = document.getElementById('limit').value;
+        
+        try {
+            const response = await fetch(`/shipments/all?offset=${offset}&limit=${limit}`);
+            const shipments = await response.json();
+            const tableBody = document.querySelector('#shipmentsTable tbody');
+            tableBody.innerHTML = ''; // Очистить текущую таблицу
+
+            if (shipments.length > 0) {
+                shipments.forEach(shipment => {
+                    const row = document.createElement('tr');
+                    row.id = `shipment-row-${shipment.id}`;
+                    row.innerHTML = `
+                        <td style="padding: 16px; border: 1px solid #ddd;">${shipment.product_id}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd;">${shipment.shipment_date}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd;">${shipment.quantity}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd;">${shipment.supplier_name}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd; text-align: center;">
+                            <button 
+                                style="padding: 8px 16px; background-color: #007bff; color: white; font-size: 14px; border-radius: 8px; border: none; cursor: pointer; margin-right: 10px;" 
+                                onclick="openEditModal('${shipment.id}', '${shipment.product_id}', '${shipment.shipment_date}', '${shipment.quantity}', '${shipment.supplier_name}')">
+                                Изменить
+                            </button>
+                            <button 
+                                style="padding: 8px 16px; background-color: #f44336; color: white; font-size: 14px; border-radius: 8px; border: none; cursor: pointer;" 
+                                onclick="deleteShipment('${shipment.id}')">
+                                Удалить
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } else {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="5" style="padding: 16px; text-align: center; color: #777;">Нет данных для отображения</td>`;
+                tableBody.appendChild(row);
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки отгрузок:', error);
+            alert('Ошибка при загрузке данных');
+        }
+    }
+
+    // Вызов загрузки отгрузок при старте страницы
+    window.onload = loadShipments;
+
+    // Функции для добавления отгрузки
+    function openAddModal() {
+        document.getElementById('addModal').style.display = 'block';
+    }
+
+    function closeAddModal() {
+        document.getElementById('addModal').style.display = 'none';
+    }
+
+    async function addShipment() {
+        const productId = document.getElementById('addProductId').value;
+        const shipmentDate = document.getElementById('addShipmentDate').value;
+        const quantity = document.getElementById('addQuantity').value;
+        const supplierName = document.getElementById('addSupplierName').value;
+
+        const data = { product_id: productId, shipment_date: shipmentDate, quantity, supplier_name: supplierName };
+
+        try {
+            const response = await fetch('/shipments/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                alert('Отгрузка успешно добавлена');
+                loadShipments(); // Перезагружаем список отгрузок
+                closeAddModal(); // Закрываем окно
+            } else {
+                alert('Ошибка при добавлении отгрузки');
+            }
+        } catch (error) {
+            console.error('Ошибка добавления отгрузки:', error);
+            alert('Ошибка при добавлении отгрузки');
+        }
+    }
+
+    // Функции для редактирования отгрузки
+    function openEditModal(id, productId, shipmentDate, quantity, supplierName) {
+        document.getElementById('editShipmentId').value = id;
+        document.getElementById('editProductId').value = productId;
+        document.getElementById('editShipmentDate').value = shipmentDate;
+        document.getElementById('editQuantity').value = quantity;
+        document.getElementById('editSupplierName').value = supplierName;
+        document.getElementById('editModal').style.display = 'block';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    async function updateShipment() {
+        const id = document.getElementById('editShipmentId').value;
+        const productId = document.getElementById('editProductId').value;
+        const shipmentDate = document.getElementById('editShipmentDate').value;
+        const quantity = document.getElementById('editQuantity').value;
+        const supplierName = document.getElementById('editSupplierName').value;
+
+        const data = { product_id: productId, shipment_date: shipmentDate, quantity, supplier_name: supplierName };
+
+        try {
+            const response = await fetch(`/shipments/edit/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                alert('Данные отгрузки обновлены');
+                loadShipments(); // Перезагружаем список отгрузок
+                closeEditModal(); // Закрываем окно
+            } else {
+                alert('Ошибка при обновлении отгрузки');
+            }
+        } catch (error) {
+            console.error('Ошибка обновления отгрузки:', error);
+            alert('Ошибка при обновлении отгрузки');
+        }
+    }
+
+    // Функция для удаления отгрузки
+    async function deleteShipment(id) {
+        if (confirm('Вы уверены, что хотите удалить эту отгрузку?')) {
+            try {
+                const response = await fetch(`/shipments/remove/${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    alert('Отгрузка успешно удалена');
+                    loadShipments(); // Перезагружаем список отгрузок
+                } else {
+                    alert('Ошибка при удалении отгрузки');
+                }
+            } catch (error) {
+                console.error('Ошибка удаления отгрузки:', error);
+                alert('Ошибка при удалении отгрузки');
+            }
+        }
+    }
+</script>
+{% endblock %}

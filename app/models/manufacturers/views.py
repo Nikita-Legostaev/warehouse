@@ -49,3 +49,9 @@ async def update_manufactors(
         raise HTTPException(status_code=404, detail="Не найдено")
     await ManufacturersRepositories.update(id=manufactors_id, **SManufacturers.model_dump())
     return {"detail": "Успешно изменено"}
+
+
+@router.get("/count")
+async def count_stock():
+    count = await ManufacturersRepositories.count()
+    return {"count": count}

@@ -2,7 +2,7 @@
 {% block content %}
 <div style="margin: 20px; padding: 20px; background-color: #f0f2f5; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
 
-    <h2 style="font-size: 28px; color: #333; font-weight: bold; margin-bottom: 20px; text-align: center;">Список товаров</h2>
+    <h2 style="font-size: 28px; color: #333; font-weight: bold; margin-bottom: 30px; text-align: center;">Список продуктов</h2>
     
     <!-- Панель управления для выбора диапазона -->
     <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; gap: 15px;">
@@ -20,12 +20,22 @@
         </button>
     </div>
 
-    <!-- Таблица товаров -->
+    <!-- Форма поиска по всем параметрам -->
+    <!-- (Оставим без изменений, так как это не влияет на пагинацию) -->
+    
+    <!-- Кнопка для добавления нового продукта -->
+    <button 
+        onclick="openAddModal()" 
+        style="margin-bottom: 30px; padding: 12px 25px; background-color: #007bff; color: white; font-size: 16px; border-radius: 8px; border: none; cursor: pointer; transition: transform 0.2s ease;">
+        Добавить продукт
+    </button>
+
+    <!-- Таблица продуктов -->
     <div style="overflow-x: auto;">
         <table id="productsTable" style="width: 100%; border-spacing: 0; font-family: 'Roboto', sans-serif; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);">
             <thead style="background-color: #007bff; color: white; text-transform: uppercase;">
                 <tr>
-                    <th style="padding: 16px 24px; text-align: left;">Название товара</th>
+                    <th style="padding: 16px 24px; text-align: left;">Название</th>
                     <th style="padding: 16px 24px; text-align: left;">Производитель</th>
                     <th style="padding: 16px 24px; text-align: left;">Категория</th>
                     <th style="padding: 16px 24px; text-align: left;">Цена</th>
@@ -34,68 +44,106 @@
                     <th style="padding: 16px 24px; text-align: left;">Склад</th>
                     <th style="padding: 16px 24px; text-align: left;">Местоположение на складе</th>
                     <th style="padding: 16px 24px; text-align: left;">Количество на складе</th>
+                    <th style="padding: 16px 24px; text-align: center;">Действия</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Здесь будет отображаться список товаров -->
+                <!-- Здесь будет отображаться список продуктов -->
             </tbody>
         </table>
     </div>
-</div>
+
+    <div id="pagination" style="margin-top: 20px; text-align: center;">
+        <button id="prevPageBtn" onclick="changePage('prev')" style="padding: 5px 15px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">
+            Предыдущая страница
+        </button>
+        <span id="pageInfo" style="margin: 0 10px;">Страница 1</span>
+        <button id="nextPageBtn" onclick="changePage('next')" style="padding: 5px 15px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">
+            Следующая страница
+        </button>
+    </div>
 
 <script>
-    // Функция для загрузки товаров с учетом offset и limit
+
+    let currentPage = 1; // Текущая страница
+    let limit = 10; // Количество продуктов на странице
+    let offset = 0; // Начальный offset (смещение)
+    let totalProducts = 0; // Общее количество продуктов
+
+    // Функция для загрузки продуктов
     async function loadProducts() {
-        const offset = document.getElementById('offset').value;
-        const limit = document.getElementById('limit').value;
+        offset = (currentPage - 1) * limit; // Расчет смещения для текущей страницы
         
         try {
             const response = await fetch(`/products/all?offset=${offset}&limit=${limit}`);
             const products = await response.json();
+            
+            // Получаем общее количество продуктов (это должен возвращать сервер)
+            totalProducts = products.total;  // Зависит от вашего API, как он возвращает общее количество
             const tableBody = document.querySelector('#productsTable tbody');
             tableBody.innerHTML = ''; // Очистить текущую таблицу
 
-            if (products.length > 0) {
-                products.forEach(product => {
+            if (products.data.length > 0) {
+                products.data.forEach(product => {
                     const row = document.createElement('tr');
-                    row.style.transition = 'background-color 0.3s, transform 0.3s ease-in-out';
-                    row.style.cursor = 'pointer';
+                    row.id = `product-row-${product.id}`;
                     row.innerHTML = `
-                        <td style="padding: 16px 24px; border-bottom: 1px solid #ddd;">${product.product_name}</td>
-                        <td style="padding: 16px 24px; border-bottom: 1px solid #ddd;">${product.manufacturer_id}</td>
-                        <td style="padding: 16px 24px; border-bottom: 1px solid #ddd;">${product.category_id}</td>
-                        <td style="padding: 16px 24px; border-bottom: 1px solid #ddd;">${product.price}</td>
-                        <td style="padding: 16px 24px; border-bottom: 1px solid #ddd;">${product.expiration_date}</td>
-                        <td style="padding: 16px 24px; border-bottom: 1px solid #ddd;">${product.weight}</td>
-                        <td style="padding: 16px 24px; border-bottom: 1px solid #ddd;">${product.stock_id}</td>
-                        <td style="padding: 16px 24px; border-bottom: 1px solid #ddd;">${product.stock_location}</td>
-                        <td style="padding: 16px 24px; border-bottom: 1px solid #ddd;">${product.stock_quantity}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd;">${product.product_name}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd;">${product.manufacturer_id}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd;">${product.category_id}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd;">${product.price}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd;">${product.expiration_date}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd;">${product.weight}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd;">${product.stock_id}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd;">${product.stock_location}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd;">${product.stock_quantity}</td>
+                        <td style="padding: 16px; border: 1px solid #ddd; text-align: center;">
+                            <button onclick="openEditModal('${product.id}')">Изменить</button>
+                            <button onclick="deleteProduct('${product.id}')">Удалить</button>
+                        </td>
                     `;
                     tableBody.appendChild(row);
-                    
-                    // Добавляем эффект на наведение на строку
-                    row.addEventListener('mouseenter', () => {
-                        row.style.backgroundColor = '#f1f9ff';
-                        row.style.transform = 'scale(1.02)';
-                    });
-
-                    row.addEventListener('mouseleave', () => {
-                        row.style.backgroundColor = 'transparent';
-                        row.style.transform = 'scale(1)';
-                    });
                 });
             } else {
                 const row = document.createElement('tr');
-                row.innerHTML = `<td colspan="9" style="padding: 16px 24px; text-align: center; color: #888;">Нет данных для отображения</td>`;
+                row.innerHTML = `<td colspan="10" style="padding: 16px; text-align: center; color: #777;">Нет данных для отображения</td>`;
                 tableBody.appendChild(row);
             }
         } catch (error) {
-            console.error('Ошибка загрузки товаров:', error);
+            console.error('Ошибка загрузки продуктов:', error);
             alert('Ошибка при загрузке данных');
         }
+
+        updatePagination();
     }
 
-    // Вызов загрузки товаров при старте страницы
+    // Функция для обновления пагинации
+    function updatePagination() {
+        document.getElementById('pageInfo').innerText = `Страница ${currentPage}`;
+        const prevPageBtn = document.getElementById('prevPageBtn');
+        const nextPageBtn = document.getElementById('nextPageBtn');
+
+        prevPageBtn.disabled = currentPage === 1;
+        nextPageBtn.disabled = currentPage === getTotalPages();
+    }
+
+    // Получение общего количества страниц
+    function getTotalPages() {
+        return Math.ceil(totalProducts / limit);
+    }
+
+    // Функция для изменения страницы
+    function changePage(direction) {
+        if (direction === 'prev' && currentPage > 1) {
+            currentPage--;
+        } else if (direction === 'next' && currentPage < getTotalPages()) {
+            currentPage++;
+        }
+        loadProducts(); // Загружаем данные для новой страницы
+    }
+
+    // Вызов загрузки продуктов при старте страницы
     window.onload = loadProducts;
+
 </script>
 {% endblock %}

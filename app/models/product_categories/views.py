@@ -46,3 +46,9 @@ async def update_category(
         raise HTTPException(status_code=404, detail="Не найдено")
     await CategoryRepositories.update(id=category_id, **SCategory.model_dump())
     return {"detail": "Успешно изменено"}
+
+
+@router.get("/count")
+async def count_stock():
+    count = await CategoryRepositories.count()
+    return {"count": count}

@@ -1,4 +1,4 @@
-from sqlalchemy import delete, insert, select, update
+from sqlalchemy import delete, insert, select, update, func
 from app.database import async_session
 
 class BaseRepositories:
@@ -53,4 +53,14 @@ class BaseRepositories:
             query = select(cls.model).where(cls.model.id == id)
             result = await session.execute(query)
             return result.scalar_one_or_none()
+        
+    @classmethod
+    async def count(cls):
+        async with async_session() as session:
+            # Убираем список и вызываем func.count() напрямую
+            query = select(func.count()).select_from(cls.model)
+            
+            result = await session.execute(query)
+            
+            return result.scalar()
             
