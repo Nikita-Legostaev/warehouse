@@ -1,0 +1,60 @@
+[tool.poetry]
+name = "warehouse"
+version = "0.1.0"
+description = ""
+authors = ["Nikita <nikitooo111333222@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["all"], version = "^0.115.11"}
+sqlalchemy = "^2.0.38"
+alembic = "^1.15.1"
+asyncpg = "^0.30.0"
+greenlet = "^3.1.1"
+mypy = "^1.15.0"
+flake8 = "^7.1.2"
+black = "^25.1.0"
+isort = "^6.0.1"
+pylint = "^3.3.5"
+autopep8 = "^2.3.2"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+pytest-asyncio = "^0.25.3"
+httpx = "^0.28.1"
+pytest-cov = "^6.0.0"
+coverage = "^7.6.12"
+pytest-mock = "^3.14.0"
+asgi-lifespan = "^2.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning"
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "tests/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise ImportError"
+]
